@@ -1,2 +1,2 @@
 # ms-interactive-viz
-## Customizable and informative mass spectra with Bokeh
+### Customizable and informative mass spectra with Bokeh
