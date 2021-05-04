@@ -1,7 +1,7 @@
 # ms-interactive-viz
 ### Customizable and informative mass spectra with Bokeh
 
-<img src="https://github.com/dev-ev/ms-interactive-viz/blob/main/Screenshots/Annotated_Static_Screenshot.PNG" alt="drawing"/>
+<img src="https://github.com/dev-ev/ms-interactive-viz/blob/main/Screenshots/Annotated_Static_Screenshot.PNG" alt="drawing" width="800"/>
 
 Notebook was created on Ubuntu 20.04 with Python 3.8.5, Bokeh 2.3.1 and JupyterLab 3.0.14.
 
