@@ -241,8 +241,6 @@ dfA2.head(7)
 
 #output_file('msms_tmt_spectrum_Cat.html')
 
-#Number of categories
-ncat = len( dfA['Annotation'].unique() )
 #Create a separate ColumnDataSource for each categorical value
 sources = []
 for idx, cat in enumerate( dfA2['Annotation'].unique() ):
