@@ -1,17 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
-
-
-
-
-
 # In[1]:
 
 
 import pandas as pd
-from bokeh.io import output_notebook
+from bokeh.io import output_notebook, reset_output
 from bokeh.plotting import figure, show, output_file
 from bokeh.models import ColumnDataSource, HoverTool, NumeralTickFormatter, Label
 from bokeh.palettes import Category10
@@ -72,13 +66,13 @@ mainTitle = 'Peptide Fragmentation Mass Spectrum'
 cds = ColumnDataSource(data=df)
 
 
-# In[6]:
+# In[7]:
 
 
 output_notebook()
 
 
-# In[7]:
+# In[8]:
 
 
 #output_file('msms_tmt_bar.html')
@@ -109,7 +103,7 @@ show(p)
 
 # But there's a problem with the bar plots: they have constant width. If we set the width to a meaningful value that is based on the actual uncertainty of the <i>m/z</i> measurement, it will be extremely narrow. And the hover tool does not work as we would want it to do! 
 
-# In[8]:
+# In[9]:
 
 
 p = figure(
@@ -129,7 +123,7 @@ show(p)
 
 # Let's modify the line, so that it adopts the expected shape, but stays continuous
 
-# In[9]:
+# In[10]:
 
 
 #Triple the points on the m/z axis
@@ -155,17 +149,16 @@ df2.head(7)
 df2.plot(x='mz', y='Intensity', figsize=(15, 4))
 
 
-# In[10]:
+# In[21]:
 
 
 #output_file('msms_tmt_spectrum2.html')
-mainTitle = 'Peptide Fragmentation Mass Spectrum'
 cds = ColumnDataSource(data=df2)
 
 p = create_p()
 
 maxIntens = df2['Intensity'].max()
-
+#Main line
 p.line(
     'mz', 'Intensity',
     source = cds,
@@ -173,29 +166,33 @@ p.line(
     line_width = 2
     )
 #Add the precursor info as a dashed line with a label
-p.line(
-    [precMZ, precMZ], [0, maxIntens*0.9],
-    line_dash = 'dashed', line_width = 4,
-    color = '#198c43', alpha = 0.5,
-    )
-p.add_layout(
-    Label(
-        x = precMZ, y = maxIntens*0.93,
-        text = f'Precursor {precMZ}, {precCh}+',
-        text_font_size = '10pt',
-        text_color = '#198c43'
+def add_precursor(p, mz, charge, intens, col):
+    p.line(
+        [mz, mz], [0, intens*0.9],
+        line_dash = 'dashed', line_width = 4,
+        color = col, alpha = 0.5,
         )
-    )
+    p.add_layout(
+        Label(
+            x = mz, y = intens*0.93,
+            text = f'Precursor {mz}, {charge}+',
+            text_font_size = '10pt',
+            text_color = col
+            )
+        )
+add_precursor(p, precMZ, precCh, maxIntens, '#198c43')
 
-#Format the axis labels
-p.xaxis.axis_label = 'Fragment m/z'
-p.xaxis.axis_label_text_font_size = '10pt'
-p.xaxis.major_label_text_font_size = '9pt'
+#Format axis labels
+def add_axis_labels(p):
+    p.xaxis.axis_label = 'Fragment m/z'
+    p.xaxis.axis_label_text_font_size = '10pt'
+    p.xaxis.major_label_text_font_size = '9pt'
 
-p.yaxis.axis_label = 'Intensity'
-p.yaxis.axis_label_text_font_size = '10pt'
-p.yaxis.major_label_text_font_size = '9pt'
-p.yaxis.formatter = NumeralTickFormatter(format='0.')
+    p.yaxis.axis_label = 'Intensity'
+    p.yaxis.axis_label_text_font_size = '10pt'
+    p.yaxis.major_label_text_font_size = '9pt'
+    p.yaxis.formatter = NumeralTickFormatter(format='0.')
+add_axis_labels(p)
 
 show(p)
 
@@ -204,7 +201,7 @@ show(p)
 
 # Download the same spectrum with annotations
 
-# In[11]:
+# In[17]:
 
 
 dfA = pd.read_csv('tmt_spectrum_annotated.csv', sep=',')
@@ -214,13 +211,13 @@ dfA.head(3)
 
 # There are 3 categories of signals:
 
-# In[12]:
+# In[18]:
 
 
 dfA['Annotation'].unique()
 
 
-# In[13]:
+# In[19]:
 
 
 mzTransformed = [ (x, x, x) for x in dfA['mz'] ]
@@ -239,16 +236,15 @@ dfA2 = pd.DataFrame(
 dfA2.head(7)
 
 
-# In[14]:
+# In[22]:
 
 
 #output_file('msms_tmt_spectrum_Cat.html')
-mainTitle = 'Peptide Fragmentation Mass Spectrum'
+
 #Number of categories
 ncat = len( dfA['Annotation'].unique() )
 #Create a separate ColumnDataSource for each categorical value
 sources = []
-
 for idx, cat in enumerate( dfA2['Annotation'].unique() ):
     sources.append(
         (
@@ -265,8 +261,9 @@ print(sources)
 p = create_p()
 
 maxIntens = df2['Intensity'].max()
-
+#Create separate line for each annotation
 for idxColor, cat, cds in sources:
+    #Assign colors from the Category10 paletted
     #If there are more than 10 categories, the colors will start to rotate
     idxColor = idxColor % 10
     p.line(
@@ -276,7 +273,7 @@ for idxColor, cat, cds in sources:
         line_width = 2, alpha = 0.7,
         legend_label=cat
     )
-#Add the baseline to make the look cleaner 
+#Add a thick horizontal line at y=0 to make the look cleaner 
 p.line(
     x = [ dfA2['mz'].min(), dfA2['mz'].max() ],
     y = [0, 0],
@@ -284,38 +281,11 @@ p.line(
     line_width = 3
 )
 p.legend.location = 'top_right'
+#Click on the legend item and the corresponding line will become hidden
 p.legend.click_policy = 'hide'
 p.legend.title = 'Signal Type'
-#Add the precursor info as a dashed line with a label
-p.line(
-    [precMZ, precMZ], [0, maxIntens*0.9],
-    line_dash = 'dashed', line_width = 4,
-    color = '#a31534', alpha = 0.5,
-    )
-p.add_layout(
-    Label(
-        x = precMZ, y = maxIntens*0.93,
-        text = f'Precursor {precMZ}, {precCh}+',
-        text_font_size = '10pt',
-        text_color = '#a31534'
-        )
-    )
 
-#Format the axis labels
-p.xaxis.axis_label = 'Fragment m/z'
-p.xaxis.axis_label_text_font_size = '10pt'
-p.xaxis.major_label_text_font_size = '9pt'
-
-p.yaxis.axis_label = 'Intensity'
-p.yaxis.axis_label_text_font_size = '10pt'
-p.yaxis.major_label_text_font_size = '9pt'
-p.yaxis.formatter = NumeralTickFormatter(format='0.')
+add_precursor(p, precMZ, precCh, maxIntens, '#a31534')
+add_axis_labels(p)
 
 show(p)
-
-
-# In[ ]:
-
-
-
-
