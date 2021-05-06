@@ -126,7 +126,7 @@ show(p)
 # In[10]:
 
 
-#Triple the points on the m/z axis
+#Triplicate the points on the m/z axis
 mzTransformed = [ (x, x, x) for x in df['mz'] ]
 #Flatten the list of tuples for the m/z axis
 mzTransformed = [ x for y in mzTransformed for x in y ]
