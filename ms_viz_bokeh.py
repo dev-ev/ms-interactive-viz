@@ -258,7 +258,7 @@ print(sources)
 
 p = create_p()
 
-maxIntens = df2['Intensity'].max()
+maxIntens = dfA2['Intensity'].max()
 #Create separate line for each annotation
 for idxColor, cat, cds in sources:
     #Assign colors from the Category10 paletted
