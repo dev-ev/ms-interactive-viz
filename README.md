@@ -3,7 +3,7 @@
 
 <img src="https://github.com/dev-ev/ms-interactive-viz/blob/main/Screenshots/Annotated_Static_Screenshot.PNG" alt="drawing" width="800"/>
 
-Notebook was created on Ubuntu 20.04 with Python 3.8.5, Bokeh 2.3.1 and JupyterLab 3.0.14.
+The notebook was created on Ubuntu 20.04 with Python 3.8.5, Bokeh 2.3.1 and JupyterLab 3.0.14.
 
 Standalone Bokeh visualizations can be saved as html files and displayed in a web browser. To display the plots in the notebook, we need to install the extension first:
 
